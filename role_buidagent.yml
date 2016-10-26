@@ -1,0 +1,22 @@
+---
+
+- name: Creates directory
+  file: path=/opt/buildAgent state=directory
+
+- name: Download buildAgent and unarhive
+  unarchive: src=http://server_tc/update/buildAgent.zip dest=/opt/buildAgent copy=no
+
+- name: Raname buildAgent.dist.properties
+  command: mv /opt/buildAgent/conf/buildAgent.dist.properties /opt/buildAgent/conf/buildAgent.properties
+
+- name: Changing serverUrl
+  lineinfile: dest=/opt/buildAgent/conf/buildAgent.properties regexp='^serverUrl' line=serverUrl=server_tc/
+
+- name: Changing agent name
+  lineinfile: dest=/opt/buildAgent/conf/buildAgent.properties regexp='^name' line=name={{ ansible_hostname }}
+
+- name: Changing Permission conf File
+  file: path=/opt/buildAgent/bin/agent.sh mode=0755
+
+- name: Start build agent
+  command: /opt/buildAgent/bin/agent.sh start
